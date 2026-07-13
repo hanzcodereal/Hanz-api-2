@@ -83,16 +83,6 @@
       ]
     },
     {
-      "name": "Canvas",
-      "items": [
-        {
-          "name": "BRAT Generator",
-          "desc": "Generate BRAT style image with text",
-          "path": "/canvas/brat?text="
-        }
-      ]
-    },
-    {
       "name": "Random",
       "items": [
         {
@@ -103,4 +93,4 @@
       ]
     }
   ]
-        }
+}
