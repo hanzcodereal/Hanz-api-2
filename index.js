@@ -25,7 +25,7 @@ app.use((req, res, next) => {
         if (data && typeof data === 'object') {
             const responseData = {
                 status: data.status,
-                creator: settings.apiSettings.creator || "Created Using Rynn UI",
+                creator: settings.apiSettings.creator || "Hanz",
                 ...data
             };
             return originalJson.call(this, responseData);
@@ -37,19 +37,26 @@ app.use((req, res, next) => {
 
 let totalRoutes = 0;
 const apiFolder = path.join(__dirname, './src/api');
-fs.readdirSync(apiFolder).forEach((subfolder) => {
-    const subfolderPath = path.join(apiFolder, subfolder);
-    if (fs.statSync(subfolderPath).isDirectory()) {
-        fs.readdirSync(subfolderPath).forEach((file) => {
-            const filePath = path.join(subfolderPath, file);
-            if (path.extname(file) === '.js') {
-                require(filePath)(app);
-                totalRoutes++;
-                console.log(chalk.bgHex('#FFFF99').hex('#333').bold(` Loaded Route: ${path.basename(file)} `));
-            }
-        });
-    }
-});
+if (fs.existsSync(apiFolder)) {
+    fs.readdirSync(apiFolder).forEach((subfolder) => {
+        const subfolderPath = path.join(apiFolder, subfolder);
+        if (fs.statSync(subfolderPath).isDirectory()) {
+            fs.readdirSync(subfolderPath).forEach((file) => {
+                const filePath = path.join(subfolderPath, file);
+                if (path.extname(file) === '.js') {
+                    try {
+                        require(filePath)(app);
+                        totalRoutes++;
+                        console.log(chalk.bgHex('#FFFF99').hex('#333').bold(` Loaded Route: ${path.basename(file)} `));
+                    } catch (err) {
+                        console.log(chalk.bgHex('#FF4444').hex('#FFF').bold(` Failed to load: ${path.basename(file)} - ${err.message} `));
+                    }
+                }
+            });
+        }
+    });
+}
+
 console.log(chalk.bgHex('#90EE90').hex('#333').bold(' Load Complete! ✓ '));
 console.log(chalk.bgHex('#90EE90').hex('#333').bold(` Total Routes Loaded: ${totalRoutes} `));
 
@@ -58,12 +65,12 @@ app.get('/', (req, res) => {
 });
 
 app.use((req, res, next) => {
-    res.status(404).sendFile(process.cwd() + "/api-page/404.html");
+    res.status(404).sendFile(path.join(__dirname, 'api-page', '404.html'));
 });
 
 app.use((err, req, res, next) => {
     console.error(err.stack);
-    res.status(500).sendFile(process.cwd() + "/api-page/500.html");
+    res.status(500).sendFile(path.join(__dirname, 'api-page', '500.html'));
 });
 
 app.listen(PORT, () => {
